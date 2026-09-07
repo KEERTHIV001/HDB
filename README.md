@@ -21,6 +21,67 @@ The main notebook to run is:
 
 ---
 
+## Setup
+
+Python 3.10+ is recommended.
+
+Create a virtual environment.
+
+### Windows
+
+```bash
+python -m venv venv
+venv\Scripts\activate
+```
+
+Install the required packages:
+
+```bash
+pip install -r requirements.txt
+pip install notebook
+```
+
+`notebook` is installed separately because it provides the `jupyter notebook` command used below. `requirements.txt` covers everything the pipeline itself needs, but not the Jupyter web interface.
+
+The `.env` file is already included in this repository at the project root. No additional setup is needed.
+
+An internet connection is required, `001_Download.ipynb` fetches the source files from data.gov.sg.
+
+---
+
+## How to Run
+
+Start Jupyter:
+
+```bash
+jupyter notebook
+```
+
+Open:
+
+```text
+000_Run_Pipeline.ipynb
+```
+
+Run the main execution cell.
+
+The pipeline will run all four stages in order.
+
+A successful run produces:
+
+```text
+data/Raw/
+data/Combined/resale_flat_prices_2012_01_to_2016_12.parquet
+data/Cleaned/cleaned_records.parquet
+data/Quarantined/quarantined_records.parquet
+data/Transformed/Transformed.parquet
+data/Hashed/Hashed.parquet
+DataProfile/HDB_Profiling_Report.html
+pipeline_execution.log
+```
+
+The pipeline execution notebook also shows a final table listing the output locations and their status.
+
 ## Project Structure
 
 ```text
@@ -31,9 +92,9 @@ The main notebook to run is:
 ├── 004_DataTransformation.ipynb
 ├── requirements.txt
 ├── .env
+├── Data Platform Architecture.png
 ├── DataProfile/
 │   └── HDB_Profiling_Report.html
-├── pipeline_execution.log
 └── data/
     ├── Raw/
     ├── Combined/
@@ -42,6 +103,8 @@ The main notebook to run is:
     ├── Transformed/
     └── Hashed/
 ```
+
+`data/` is not commited to this repository. Its created when `000_Run_Pipeline.ipynb` runs and hold the outputs of each stage.
 
 ## What Each Notebook Does
 
@@ -130,16 +193,16 @@ data/Hashed/Hashed.parquet
 
 Quick reference for every file the pipeline reads or writes:
 
-| File / Folder      | Path                                                          | Description                                                                                                                                   |
-| ------------------ | ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| Raw Data           | `data/Raw/`                                                   | Original CSV files downloaded from data.gov.sg, as is                                                                                         |
-| Combined Data      | `data/Combined/resale_flat_prices_2012_01_to_2016_12.parquet` | All raw files unioned together and filtered to Jan 2012 to Dec 2016 and converted to parquet                                                  |
-| Cleaned Data       | `data/Cleaned/cleaned_records.parquet`                        | Records that passed every validation check                                                                                                    |
-| Quarantined Data   | `data/Quarantined/quarantined_records.parquet`                | Records that failed validation, duplicates and flagged as anomalous                                                                           |
-| Transformed Data   | `data/Transformed/Transformed.parquet`                        | Cleaned records plus the Resale Identifier                                                                                                    |
-| Hashed Data        | `data/Hashed/Hashed.parquet`                                  | Transformed records plus the hashed identifier                                                                                                |
-| Profile Report     | `DataProfile/HDB_Profiling_Report.html`                       | Automated profiling report from stage 003                                                                                                     |
-| Environment Config | `.env`                                                        | Holds `DATAGOV_API_KEY` and `APP_PEPPER`. Included in this submission for the tester visiblity only, *see the Environment File section below* |
+| File / Folder        | Path                                                          | Description                                                                                                                                              |
+| -------------------- | ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Raw Data             | `data/Raw/`                                                   | Original CSV files downloaded from data.gov.sg, as is                                                                                                    |
+| Combined Data        | `data/Combined/resale_flat_prices_2012_01_to_2016_12.parquet` | All raw files unioned together and filtered to Jan 2012 to Dec 2016 and converted to parquet                                                             |
+| Cleaned Data         | `data/Cleaned/cleaned_records.parquet`                        | Records that passed every validation check                                                                                                               |
+| Quarantined Data     | `data/Quarantined/quarantined_records.parquet`                | Records that failed validation, duplicates and flagged as anomalous                                                                                      |
+| Transformed Data     | `data/Transformed/Transformed.parquet`                        | Cleaned records plus the Resale Identifier                                                                                                               |
+| Hashed Data          | `data/Hashed/Hashed.parquet`                                  | Transformed records plus the hashed identifier                                                                                                           |
+| Architecture Diagram | `Data Platform Architecture.png`                              | AWS Architecture (Part 2)                                                                                                                                |
+| Environment Config   | `.env`                                                        | Holds `DATAGOV_API_KEY` and `APP_PEPPER`. **<u>Included in this submission for the tester visiblity only</u>**, *see the Environment File section below* |
 
 ## Other Output Files
 
@@ -178,61 +241,13 @@ For this technical test, the `.env` file is included with the submission so the 
 
 ---
 
-## Setup
+## Architecture
 
-Python 3.10+ is recommended.
+`Data Platform Architecture.png` 
 
-Create a virtual environment.
+AWS data solution architecture for data ingestion and data exploration (Part 2), covering the batch ingestion path from data.gov.sg and Tableau analytics.
 
-### Windows
 
-```bash
-python -m venv venv
-venv\Scripts\activate
-```
-
-Install the required packages:
-
-```bash
-pip install -r requirements.txt
-```
-
-Make sure the `.env` file is in the project root.
-
----
-
-## How to Run
-
-Start Jupyter:
-
-```bash
-jupyter notebook
-```
-
-Open:
-
-```text
-000_Run_Pipeline.ipynb
-```
-
-Run the main execution cell.
-
-The pipeline will run all four stages in order.
-
-A successful run produces:
-
-```text
-data/Raw/
-data/Combined/resale_flat_prices_2012_01_to_2016_12.parquet
-data/Cleaned/cleaned_records.parquet
-data/Quarantined/quarantined_records.parquet
-data/Transformed/Transformed.parquet
-data/Hashed/Hashed.parquet
-DataProfile/HDB_Profiling_Report.html
-pipeline_execution.log
-```
-
-The pipeline execution notebook also shows a final table listing the output locations and their status.
 
 ## Processing Flow
 
